@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>抗炎挑战 · 情侣打卡</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=LXGW+WenKai:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script>
+    tailwind.config={theme:{extend:{fontFamily:{kai:['LXGW WenKai','serif']},colors:{cream:'#F7F3EC',forest:'#2D6A4F',mint:'#52B788',terra:'#E76F51',bark:'#1B1B1B',sand:'#E5E0D8'}}}}
+    </script>
+    <style>
+        *{box-sizing:border-box;margin:0;padding:0}
+        body{font-family:'LXGW WenKai',serif;background:#F7F3EC;color:#1B1B1B;overflow-x:hidden;min-height:100dvh}
+        .blob{position:fixed;border-radius:50%;filter:blur(90px);opacity:.22;pointer-events:none;z-index:0}
+        .blob-1{width:300px;height:300px;background:#52B788;top:-80px;right:-60px;animation:bf 18s ease-in-out infinite}
+        .blob-2{width:250px;height:250px;background:#E76F51;bottom:10%;left:-80px;animation:bf 22s ease-in-out infinite reverse}
+        .blob-3{width:200px;height:200px;background:#F4A261;top:40%;right:-50px;animation:bf 15s ease-in-out infinite 3s}
+        @keyframes bf{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(30px,-20px) scale(1.05)}66%{transform:translate(-20px,15px) scale(.95)}}
+        .page{display:none;animation:fsi .35s ease}.page.active{display:block}
+        @keyframes fsi{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+        .progress-ring{transform:rotate(-90deg)}.progress-ring__bg{stroke:#E5E0D8}.progress-ring__fill{transition:stroke-dashoffset .8s ease}
+        .fire{display:inline-block;animation:fl .8s ease-in-out infinite alternate}
+        @keyframes fl{0%{transform:scale(1) rotate(-3deg)}100%{transform:scale(1.1) rotate(3deg)}}
+        input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:3px;background:#E5E0D8;outline:none}
+        input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:#2D6A4F;cursor:pointer;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.15);transition:transform .15s}
+        input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
+        .nav-item{transition:all .25s;position:relative}.nav-item.active{color:#2D6A4F}
+        .nav-item.active::before{content:'';position:absolute;top:-2px;left:50%;transform:translateX(-50%);width:20px;height:3px;background:#2D6A4F;border-radius:2px}
+        .cal-day{aspect-ratio:1;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;transition:all .2s}
+        .cal-day:hover{transform:scale(1.08)}.cal-day.checked{background:#D8F3DC;color:#2D6A4F;font-weight:700}
+        .cal-day.cheated{background:#FEE2E2;color:#DC2626;font-weight:700}.cal-day.missed{background:#F3F0EB;color:#9CA3AF}
+        .cal-day.future{color:#D1D5DB;cursor:default}.cal-day.future:hover{transform:none}.cal-day.today{box-shadow:0 0 0 2px #2D6A4F}
+        .mo{position:fixed;inset:0;background:rgba(0,0,0,.4);backdrop-filter:blur(4px);z-index:100;display:none;align-items:flex-end;justify-content:center}
+        .mo.show{display:flex;animation:fi .2s ease}
+        .mc{background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:500px;max-height:85vh;overflow-y:auto;animation:su .3s ease}
+        @keyframes fi{from{opacity:0}to{opacity:1}}@keyframes su{from{transform:translateY(100%)}to{transform:translateY(0)}}
+        .toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-100px);z-index:200;padding:12px 24px;border-radius:12px;color:#fff;font-size:14px;font-weight:700;transition:transform .4s cubic-bezier(.34,1.56,.64,1);pointer-events:none;white-space:nowrap;max-width:90vw;overflow:hidden;text-overflow:ellipsis}
+        .toast.show{transform:translateX(-50%) translateY(0)}.toast.success{background:#2D6A4F}.toast.error{background:#DC2626}.toast.info{background:#E76F51}
+        .card{background:#fff;border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,.04),0 4px 12px rgba(0,0,0,.03);border:1px solid #F0ECE4}
+        .ip{position:fixed;inset:0;z-index:150;background:#F7F3EC;display:flex;align-items:center;justify-content:center;overflow-y:auto}
+        .ip.hidden{display:none}.il{font-size:48px;color:#52B788;animation:ls 3s ease-in-out infinite}
+        @keyframes ls{0%,100%{transform:rotate(-5deg) scale(1)}50%{transform:rotate(5deg) scale(1.05)}}
+        .db{padding:8px 20px;border-radius:10px;border:2px solid #E5E0D8;cursor:pointer;transition:all .2s;font-family:inherit;font-size:15px;background:transparent;color:#6B7280}
+        .db.active{border-color:#2D6A4F;background:#D8F3DC;color:#2D6A4F;font-weight:700}.db:hover{border-color:#52B788}
+        #cc{position:fixed;inset:0;z-index:300;pointer-events:none;display:none}
+        .inf{width:100%;padding:12px 16px;border-radius:12px;border:2px solid #E5E0D8;font-family:inherit;font-size:15px;background:#FAFAF8;transition:border-color .2s;outline:none}
+        .inf:focus{border-color:#52B788}.inf::placeholder{color:#BDB9B0}textarea.inf{resize:none;min-height:60px}
+        .ft{display:inline-block;padding:5px 12px;border-radius:20px;font-size:13px;background:#F0F7F2;color:#2D6A4F;margin:3px;transition:all .2s;cursor:default}
+        .ft:hover{background:#D8F3DC;transform:scale(1.03)}
+        .sd{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0}.sd.on{background:#2D6A4F;box-shadow:0 0 6px rgba(45,106,79,.5)}.sd.off{background:#D1D5DB}
+        details summary{list-style:none}details summary::-webkit-details-marker{display:none}
+        details summary::after{content:'\f078';font-family:'Font Awesome 6 Free';font-weight:900;font-size:10px;margin-left:4px;transition:transform .2s}
+        details[open] summary::after{transform:rotate(180deg)}
+        .sn{width:22px;height:22px;border-radius:50%;background:#2D6A4F;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+        ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#D1CCC4;border-radius:2px}
+        @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+    </style>
+</head>
+<body>
+<div class="blob blob-1"></div><div class="blob blob-2"></div><div class="blob blob-3"></div>
+<canvas id="cc"></canvas><div id="toast" class="toast"></div>
+
+<!-- 初始化页 -->
+<div id="initPage" class="ip">
+<div class="w-full max-w-sm px-6 py-10">
+    <div class="text-center"><div class="il mb-4"><i class="fa-solid fa-leaf"></i></div><h1 class="text-3xl font-bold text-bark mb-2">抗炎挑战</h1><p class="text-sm text-gray-500 mb-8">和TA一起，吃出健康</p></div>
+    <div class="space-y-4 mb-6">
+        <div class="text-left"><label class="text-xs text-gray-500 mb-1 block">你的名字</label><input id="iN1" class="inf" placeholder="输入你的名字" maxlength="10"></div>
+        <div class="text-left"><label class="text-xs text-gray-500 mb-1 block">TA的名字</label><input id="iN2" class="inf" placeholder="输入TA的名字" maxlength="10"></div>
+    </div>
+    <div class="text-left mb-6"><label class="text-xs text-gray-500 mb-2 block">挑战天数</label><div class="flex gap-3"><button class="db" data-days="30" onclick="sD(this)">30天</button><button class="db active" data-days="60" onclick="sD(this)">60天</button><button class="db" data-days="90" onclick="sD(this)">90天</button></div></div>
+    <details class="text-left mb-6">
+        <summary class="text-xs text-gray-400 cursor-pointer hover:text-gray-600 flex items-center gap-1"><i class="fa-solid fa-cloud"></i><span>云端同步（填了才能跨手机同步）</span><span id="sdI" class="sd off ml-1"></span></summary>
+        <div class="mt-3 space-y-3 p-4 bg-gray-50 rounded-xl">
+            <p class="text-[11px] text-gray-400 leading-relaxed mb-3">使用 <b>腾讯云开发 CloudBase</b>（国内服务，免费），只需填 <b>1 个环境 ID</b>。</p>
+            <div class="space-y-2 text-[11px] text-gray-400 bg-white rounded-lg p-3 leading-relaxed">
+                <div class="font-bold text-bark text-xs mb-1">配置步骤（一次性）：</div>
+                <div class="flex gap-2 items-start"><span class="sn">1</span><span>打开 <b>cloudbase.cloud.tencent.com</b>，微信扫码登录</span></div>
+                <div class="flex gap-2 items-start"><span class="sn">2</span><span>「新建环境」→ 选「免费基础版」→ 创建</span></div>
+                <div class="flex gap-2 items-start"><span class="sn">3</span><span>进入环境 → 左侧「数据库」→ 新建集合 <b>challenge</b></span></div>
+                <div class="flex gap-2 items-start"><span class="sn">4</span><span>点集合名旁的「权限设置」→ 改为 <b>所有用户可读写</b></span></div>
+                <div class="flex gap-2 items-start"><span class="sn">5</span><span>左侧「安全设置」→ 开启 <b>匿名登录</b></span></div>
+                <div class="flex gap-2 items-start"><span class="sn">6</span><span>复制环境 ID（格式 env-xxxxxx）填到下面</span></div>
+            </div>
+            <div><label class="text-[10px] text-gray-400 mb-1 block">环境 ID</label><input id="cbEnv" class="inf text-xs" placeholder="env-xxxxxxxx"></div>
+            <button onclick="testCB()" id="cbBtn" class="w-full py-2.5 bg-forest/10 text-forest rounded-xl text-xs font-bold hover:bg-forest/20 transition-colors"><i class="fa-solid fa-plug mr-1"></i> 测试连接</button>
+            <div id="cbSt" class="text-xs text-center"></div>
+        </div>
+    </details>
+    <button onclick="startCh()" class="w-full py-3.5 bg-forest text-white rounded-2xl font-bold text-base hover:bg-mint transition-colors active:scale-[0.97]">开始挑战 <i class="fa-solid fa-arrow-right ml-1"></i></button>
+    <p class="text-[10px] text-gray-300 text-center mt-3">不填云端配置也可以先用，数据存在本机</p>
+</div>
+</div>
+
+<!-- 主应用 -->
+<div id="app" class="relative z-10 pb-20 pt-16" style="display:none;">
+<header class="fixed top-0 left-0 right-0 z-50 bg-cream/80 backdrop-blur-lg border-b border-sand/50">
+    <div class="max-w-lg mx-auto flex items-center justify-between px-4 h-14">
+        <button onclick="togU()" class="flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-sand/50 transition-colors"><span id="hA" class="w-7 h-7 rounded-full bg-forest text-white flex items-center justify-center text-xs font-bold"></span><span id="hN" class="text-sm font-bold text-bark"></span><i class="fa-solid fa-repeat text-xs text-gray-400"></i></button>
+        <div class="flex items-center gap-2"><span id="sdH" class="sd off" title="云端同步状态"></span><h1 class="text-sm font-bold text-forest tracking-wide">抗炎挑战</h1></div>
+        <button onclick="showFM()" class="w-9 h-9 rounded-full hover:bg-sand/50 transition-colors flex items-center justify-center text-forest"><i class="fa-solid fa-seedling"></i></button>
+    </div>
+</header>
+<main class="max-w-lg mx-auto px-4">
+    <section id="p-ov" class="page active pt-4"><div id="xOC" class="grid grid-cols-2 gap-3 mb-5"></div><div id="xMS" class="card p-4 mb-5"></div><div id="xTR" class="card p-4 mb-5"></div><div id="xPP" class="card p-4"></div></section>
+    <section id="p-ci" class="page pt-4"><div id="xCI"></div></section>
+    <section id="p-ca" class="page pt-4"><div id="xCA"></div></section>
+    <section id="p-pn" class="page pt-4"><div id="xPN"></div></section>
+</main>
+<nav class="fixed bottom-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-lg border-t border-sand/50">
+    <div class="max-w-lg mx-auto flex items-center justify-around h-14">
+        <button class="nav-item active flex flex-col items-center gap-0.5 py-1 px-3" data-p="ov" onclick="swP('ov')"><i class="fa-solid fa-chart-pie text-lg"></i><span class="text-[10px] font-bold">概览</span></button>
+        <button class="nav-item flex flex-col items-center gap-0.5 py-1 px-3" data-p="ci" onclick="swP('ci')"><i class="fa-solid fa-pen-to-square text-lg"></i><span class="text-[10px] font-bold">打卡</span></button>
+        <button class="nav-item flex flex-col items-center gap-0.5 py-1 px-3" data-p="ca" onclick="swP('ca')"><i class="fa-regular fa-calendar text-lg"></i><span class="text-[10px] font-bold">日历</span></button>
+        <button class="nav-item flex flex-col items-center gap-0.5 py-1 px-3" data-p="pn" onclick="swP('pn')"><i class="fa-solid fa-wallet text-lg"></i><span class="text-[10px] font-bold">罚款池</span></button>
+    </div>
+</nav>
+</div>
+
+<!-- 食材库弹窗 -->
+<div id="mFM" class="mo" onclick="if(event.target===this)this.classList.remove('show')"><div class="mc p-6"><div class="flex items-center justify-between mb-5"><h2 class="text-lg font-bold text-bark">抗炎食材参考库</h2><button onclick="document.getElementById('mFM').classList.remove('show')" class="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-400"><i class="fa-solid fa-xmark"></i></button></div><div id="fml"></div></div></div>
+<!-- 日历详情/编辑/删除弹窗 -->
+<div id="mDT" class="mo" onclick="if(event.target===this)this.classList.remove('show')"><div class="mc p-6"><div class="flex items-center justify-between mb-4"><h2 id="dTi" class="text-lg font-bold text-bark"></h2><button onclick="document.getElementById('mDT').classList.remove('show')" class="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-400"><i class="fa-solid fa-xmark"></i></button></div><div id="dBd"></div></div></div>
+<!-- 小红书文案弹窗 -->
+<div id="mSH" class="mo" onclick="if(event.target===this)this.classList.remove('show')"><div class="mc p-6"><div class="flex items-center justify-between mb-4"><h2 class="text-lg font-bold text-bark">小红书打卡文案</h2><button onclick="document.getElementById('mSH').classList.remove('show')" class="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-400"><i class="fa-solid fa-xmark"></i></button></div><p class="text-xs text-gray-400 mb-3">长按文字全选复制，或点下方按钮</p><textarea id="shT" class="inf text-sm leading-relaxed" rows="12" readonly style="resize:none;background:#FAFAF8;"></textarea><button onclick="cpSH()" class="w-full mt-3 py-3 bg-terra text-white rounded-xl font-bold text-sm hover:bg-terra/90 transition-colors active:scale-[0.97]"><i class="fa-solid fa-copy mr-1"></i> 复制文案</button></div></div>
+
+<script>
+/* ===== 常量 ===== */
+const SK='anti_inflam_v3',CK='cb_cfg';
+const SL=['','很差','较差','一般','良好','很好'],SE=['','😫','😐','🙂','😊','🤩'];
+const MS=[{d:7,t:'初露锋芒',x:'习惯开始养成'},{d:14,t:'渐入佳境',x:'身体在悄悄变化'},{d:21,t:'脱胎换骨',x:'抗炎饮食已成自然'},{d:30,t:'抗炎达人',x:'一个月！你做到了'},{d:60,t:'生活美学',x:'抗炎即生活'},{d:90,t:'传奇缔造者',x:'三个月！传奇'}];
+const FD={'优质蛋白':['三文鱼','沙丁鱼','秋刀鱼','鸡胸肉','鸡蛋','豆腐','毛豆','虾'],'深色蔬菜':['菠菜','羽衣甘蓝','西兰花','紫甘蓝','番茄','甜椒','芦笋','芹菜'],'健康脂肪':['牛油果','特级初榨橄榄油','核桃','杏仁','亚麻籽','奇亚籽'],'全谷物':['糙米','燕麦','藜麦','荞麦','红薯','南瓜','玉米'],'抗炎香料':['姜黄','生姜','大蒜','肉桂','迷迭香','百里香','黑胡椒'],'浆果水果':['蓝莓','草莓','樱桃','黑莓','覆盆子','石榴'],'饮品':['绿茶','白茶','姜茶','柠檬水','骨头汤','无糖酸奶']};
+
+/* ===== 状态 ===== */
+let D=null,cbOk=false,cbDocId=null,lastH='',cPg='ov',cY=new Date().getFullYear(),cM=new Date().getMonth(),selTd=60;
+let cbApp=null,cbDb=null,cbWatcher=null;
+
+/* ===== 工具 ===== */
+const gt=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
+const fm=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+const pd=s=>{const[y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)};
+const db2=(a,b)=>Math.round((b-a)/864e5);
+const eh=s=>{const d=document.createElement('div');d.textContent=s;return d.innerHTML};
+const av=a=>a.length?a.reduce((s,v)=>s+v,0)/a.length:0;
+const cu=()=>D.currentUser,ou=()=>cu()==='user1'?'user2':'user1',un=id=>D.users[id].name;
+function gSt(u){const c=D.users[u].checkins;let s=0,d=new Date();if(!c[gt()])d.setDate(d.getDate()-1);while(c[fm(d)]){s++;d.setDate(d.getDate()-1)}return s}
+function gCc(u){return Object.keys(D.users[u].checkins).length}
+function gPt(u){return D.users[u].penalties.reduce((s,p)=>s+p.amount,0)}
+function gDs(u,ds){const c=D.users[u].checkins;if(c[ds])return c[ds].cheated?'cheated':'checked';const st=D.challenge.startDate;if(st&&ds>=st&&ds<gt())return'missed';return''}
+function gSh(u,m){return Object.keys(D.users[u].checkins).sort().map(d=>D.users[u].checkins[d].scores[m]||0)}
+function gBs(u){const ds=Object.keys(D.users[u].checkins).sort();if(!ds.length)return 0;let b=1,c=1;for(let i=1;i<ds.length;i++){if(db2(pd(ds[i-1]),pd(ds[i]))===1){c++;b=Math.max(b,c)}else c=1}return Math.max(b,c)}
+function hsh(s){let h=0;for(let i=0;i<s.length;i++)h=((h<<5)-h+s.charCodeAt(i))|0;return h.toString(36)}
+
+/* ===== 腾讯云开发 CloudBase 云同步 ===== */
+/* 动态加载 SDK：不填云同步的用户不会加载这个几百KB的文件 */
+function loadCBSDK(){
+    return new Promise((resolve,reject)=>{
+        if(window.cloudbase){resolve();return}
+        const s=document.createElement('script');
+        s.src='https://cdn.jsdelivr.net/npm/@cloudbase/js-sdk@2.7.16/dist/cloudbase.full.js';
+        s.onload=resolve;s.onerror=()=>reject(new Error('SDK加载失败'));
+        document.head.appendChild(s);
+    })
+}
+async function testCB(){
+    const envId=document.getElementById('cbEnv').value.trim(),st=document.getElementById('cbSt'),btn=document.getElementById('cbBtn');
+    if(!envId){showToast('请填写环境 ID','error');return}
+    if(!envId.startsWith('env-')){showToast('环境 ID 应以 env- 开头','error');return}
+    st.innerHTML='<span class="text-gray-400"><i class="fa-solid fa-spinner fa-spin mr-1"></i>加载SDK并连接中（首次较慢）...</span>';btn.disabled=true;
+    try{
+        await loadCBSDK();
+        cbApp=cloudbase.init({env:envId});
+        cbDb=cbApp.database();
+        await cbApp.auth().anonymousAuthProvider().signIn();
+        cbOk=true;
+        /* 保存配置到本地 */
+        localStorage.setItem(CK,JSON.stringify({env:envId}));
+        uSD(true);
+        st.innerHTML='<span class="text-forest font-bold"><i class="fa-solid fa-check-circle mr-1"></i>连接成功！数据将实时同步</span>';
+        showToast('云端连接成功','success');
+        /* 拉取已有数据 */
+        await pullCB();
+        /* 开启实时监听 */
+        startWatch();
+    }catch(e){
+        cbOk=false;uSD(false);
+        st.innerHTML='<span class="text-red-500 font-bold"><i class="fa-solid fa-times-circle mr-1"></i>失败：'+e.message+'</span>';
+        showToast('连接失败：'+e.message,'error');
+    }
+    btn.disabled=false;
+}
+async function pullCB(){
+    if(!cbDb)return;
+    try{
+        const res=await cbDb.collection('challenge').limit(1).get();
+        if(res.data&&res.data.length>0){
+            cbDocId=res.data[0]._id;
+            if(res.data[0].json){
+                const cd=JSON.parse(res.data[0].json);
+                if(cd&&cd.initialized){
+                    D=cd;localStorage.setItem(SK,JSON.stringify(D));lastH=hsh(res.data[0].json);
+                    if(document.getElementById('initPage')&&!document.getElementById('initPage').classList.contains('hidden')){
+                        document.getElementById('initPage').classList.add('hidden');
+                        document.getElementById('app').style.display='block';
+                    }
+                    rAll();
+                }
+            }
+        }
+    }catch(e){console.warn('CB拉取失败:',e.message)}
+}
+function startWatch(){
+    if(!cbDb||cbWatcher)return;
+    try{
+        cbWatcher=cbDb.collection('challenge').where({}).watch({
+            onChange:snap=>{
+                if(snap.docChanges&&snap.docChanges.length>0){
+                    const ch=snap.docChanges[snap.docChanges.length-1];
+                    if(ch.doc&&ch.doc.json){
+                        const h=hsh(ch.doc.json);
+                        if(h!==lastH&&ch.doc.json){
+                            try{
+                                const cd=JSON.parse(ch.doc.json);
+                                if(cd&&cd.initialized){lastH=h;D=cd;localStorage.setItem(SK,JSON.stringify(D));rAll()}
+                            }catch(e){}
+                        }
+                    }
+                    if(ch.doc&&ch.doc._id)cbDocId=ch.doc._id;
+                }
+            },
+            onError:err=>{console.warn('watch错误:',err)}
+        });
+    }catch(e){console.warn('watch启动失败:',e.message)}
+}
+async function pushCB(){
+    if(!cbOk||!cbDb)return;
+    const json=JSON.stringify(D);lastH=hsh(json);
+    try{
+        if(cbDocId){await cbDb.collection('challenge').doc(cbDocId).update({json})}
+        else{const res=await cbDb.collection('challenge').add({json});cbDocId=res.id}
+    }catch(e){console.warn('CB推送失败:',e.message)}
+}
+function uSD(on){const c=on?'on':'off';['sdI','sdH'].forEach(id=>{const e=document.getElementById(id);if(e){e.classList.remove('on','off');e.classList.add(c)}})}
+
+/* ===== 持久化 ===== */
+function save(){localStorage.setItem(SK,JSON.stringify(D));pushCB()}
+function loadL(){try{const r=localStorage.getItem(SK);if(r){D=JSON.parse(r);return true}}catch(e){}return false}
+
+/* ===== 初始化 ===== */
+function sD(b){document.querySelectorAll('.db').forEach(x=>x.classList.remove('active'));b.classList.add('active');selTd=parseInt(b.dataset.days)}
+function startCh(){
+    const n1=document.getElementById('iN1').value.trim(),n2=document.getElementById('iN2').value.trim();
+    if(!n1||!n2){showToast('请填写两人的名字','error');return}
+    D={challenge:{startDate:gt(),targetDays:selTd,rewardGoal:'挑战结束后一起吃顿好的'},users:{user1:{name:n1,checkins:{},penalties:[]},user2:{name:n2,checkins:{},penalties:[]}},currentUser:'user1',initialized:true};
+    save();document.getElementById('initPage').classList.add('hidden');document.getElementById('app').style.display='block';rAll()
+}
+async function init(){
+    loadL();
+    /* 自动恢复云端连接 */
+    try{
+        const cfg=JSON.parse(localStorage.getItem(CK));
+        if(cfg&&cfg.env){
+            document.getElementById('cbEnv').value=cfg.env;
+            await loadCBSDK();
+            cbApp=cloudbase.init({env:cfg.env});
+            cbDb=cbApp.database();
+            try{
+                await cbApp.auth().anonymousAuthProvider().signIn();
+                cbOk=true;uSD(true);
+                await pullCB();startWatch();
+            }catch(e){cbOk=false;uSD(false)}
+        }
+    }catch(e){}
+    if(D&&D.initialized){document.getElementById('initPage').classList.add('hidden');document.getElementById('app').style.display='block';rAll()}
+}
+
+/* ===== 页面 ===== */
+function swP(p){cPg=p;document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById('p-'+p).classList.add('active');document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active',n.dataset.p===p));rP(p)}
+function togU(){D.currentUser=ou();save();rAll();showToast('已切换到 '+un(cu()),'info')}
+function rAll(){uH();rP(cPg)}
+function uH(){document.getElementById('hA').textContent=un(cu()).charAt(0);document.getElementById('hN').textContent=un(cu())}
+function rP(p){uH();if(p==='ov')rOV();else if(p==='ci')rCI();else if(p==='ca')rCA();else if(p==='pn')rPN()}
+
+/* ===== 概览 ===== */
+function rOV(){rOC();rMS();rTR();rPP()}
+function rOC(){
+    document.getElementById('xOC').innerHTML=['user1','user2'].map(uid=>{
+        const cc=gCc(uid),tt=D.challenge.targetDays,pct=Math.min(100,Math.round(cc/tt*100)),sk=gSt(uid),pn=gPt(uid),ic=uid===cu();
+        const ci=2*Math.PI*38,of=ci-(pct/100)*ci,rc=uid==='user1'?'#2D6A4F':'#E76F51';
+        return`<div class="card p-4 ${ic?'ring-2 ring-forest/30':''} cursor-pointer" onclick="D.currentUser='${uid}';save();rAll()"><div class="flex items-center gap-2 mb-3"><span class="w-6 h-6 rounded-full text-white text-xs flex items-center justify-center font-bold" style="background:${rc}">${un(uid).charAt(0)}</span><span class="text-sm font-bold truncate">${un(uid)}</span>${ic?'<span class="text-[10px] text-forest bg-forest/10 px-1.5 py-0.5 rounded-full font-bold">当前</span>':''}</div><div class="flex justify-center mb-2 relative"><svg width="90" height="90" class="progress-ring"><circle class="progress-ring__bg" cx="45" cy="45" r="38" fill="none" stroke-width="6"/><circle class="progress-ring__fill" cx="45" cy="45" r="38" fill="none" stroke="${rc}" stroke-width="6" stroke-linecap="round" stroke-dasharray="${ci}" stroke-dashoffset="${of}"/></svg><div class="absolute inset-0 flex flex-col items-center justify-center"><span class="text-xl font-bold text-bark">${pct}%</span><span class="text-[10px] text-gray-400">${cc}/${tt}</span></div></div><div class="flex items-center justify-between text-xs"><span class="${sk>0?'text-terra font-bold':'text-gray-400'}">${sk>0?'<span class="fire">🔥</span> '+sk+'天':'暂无连续'}</span><span class="${pn>0?'text-red-500':'text-gray-400'}">${pn>0?'¥'+pn:'无罚款'}</span></div></div>`
+    }).join('')
+}
+function rMS(){const b=gBs(cu());document.getElementById('xMS').innerHTML=`<h3 class="text-sm font-bold text-bark mb-3"><i class="fa-solid fa-trophy text-terra mr-1.5"></i>里程碑</h3><div class="grid grid-cols-2 gap-2">${MS.map(m=>{const u=b>=m.d;return`<div class="flex items-center gap-2 p-2.5 rounded-xl ${u?'bg-forest/5':'bg-gray-50'}"><span class="text-lg">${u?'🏅':'🔒'}</span><div><div class="text-xs font-bold ${u?'text-forest':'text-gray-400'}">${m.t}</div><div class="text-[10px] ${u?'text-gray-500':'text-gray-300'}">${m.d}天 · ${m.x}</div></div></div>`}).join('')}</div>`}
+function rTR(){
+    const ms=[{k:'energy',l:'精力',c:'#2D6A4F'},{k:'sleep',l:'睡眠',c:'#5B8C5A'},{k:'skin',l:'皮肤',c:'#E76F51'},{k:'digestion',l:'消化',c:'#F4A261'}];
+    document.getElementById('xTR').innerHTML=`<h3 class="text-sm font-bold text-bark mb-3"><i class="fa-solid fa-chart-line text-mint mr-1.5"></i>${un(cu())} 的身体变化</h3><div class="grid grid-cols-2 gap-3">${ms.map(m=>{const d=gSh(cu(),m.k).slice(-14);return`<div class="p-3 rounded-xl bg-gray-50/80"><div class="flex items-center justify-between mb-2"><span class="text-xs font-bold" style="color:${m.c}">${m.l}</span>${d.length>0?'<span class="text-xs text-gray-400">均值 '+av(d).toFixed(1)+'</span>':''}</div>${d.length>=2?spL(d,m.c):'<div class="text-[11px] text-gray-300">两天后显示趋势</div>'}</div>`}).join('')}</div>`
+}
+function spL(d,c){const w=140,h=36,p=4;const pts=d.map((v,i)=>`${p+(i/(d.length-1))*(w-p*2)},${p+(1-(v-1)/4)*(h-p*2)}`);const ar=[...pts,`${pts[pts.length-1].split(',')[0]},${h}`,`${pts[0].split(',')[0]},${h}`];return`<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><polygon points="${ar.join(' ')}" fill="${c}" opacity="0.08"/><polyline points="${pts.join(' ')}" fill="none" stroke="${c}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="${pts[pts.length-1].split(',')[0]}" cy="${pts[pts.length-1].split(',')[1]}" r="3" fill="${c}"/></svg>`}
+function rPP(){const t=gPt('user1')+gPt('user2');document.getElementById('xPP').innerHTML=`<div class="flex items-center justify-between"><h3 class="text-sm font-bold text-bark"><i class="fa-solid fa-piggy-bank text-terra mr-1.5"></i>罚款池</h3><button onclick="swP('pn')" class="text-xs text-forest font-bold">详情 <i class="fa-solid fa-chevron-right text-[10px]"></i></button></div><div class="mt-3 flex items-end gap-2"><span class="text-3xl font-bold text-terra">¥${t}</span><span class="text-xs text-gray-400 mb-1">${t>0?'累计罚款':'还没有罚款'}</span></div>${t>0?'<div class="mt-2 text-xs text-gray-500"><i class="fa-solid fa-bullseye text-terra mr-1"></i>用途：'+eh(D.challenge.rewardGoal)+'</div>':''}`}
+
+/* ===== 打卡 ===== */
+function rCI(){
+    const el=document.getElementById('xCI'),td=gt(),ci=D.users[cu()].checkins[td],dn=db2(pd(D.challenge.startDate),pd(td))+1,ml={breakfast:'早餐',lunch:'午餐',dinner:'晚餐'};
+    if(ci){
+        el.innerHTML=`<div class="card p-5 text-center mb-4"><div class="w-16 h-16 rounded-full bg-mint/20 flex items-center justify-center mx-auto mb-3"><i class="fa-solid fa-check text-2xl text-forest"></i></div><h2 class="text-lg font-bold text-bark mb-1">今日已打卡</h2><p class="text-sm text-gray-400">第 ${dn} 天 · ${ci.cheated?'<span class="text-red-500">（有破戒记录）</span>':'完美抗炎'}</p></div><div class="card p-4 mb-3"><h3 class="text-xs font-bold text-gray-400 mb-2">今日饮食</h3>${['breakfast','lunch','dinner'].map(m=>ci.meals[m]?`<div class="mb-1.5"><span class="text-xs font-bold text-forest">${ml[m]}</span><p class="text-sm text-bark">${eh(ci.meals[m])}</p></div>`:'').join('')}${ci.meals.snack?'<div><span class="text-xs font-bold text-forest">加餐</span><p class="text-sm text-bark">'+eh(ci.meals.snack)+'</p></div>':''}</div><div class="card p-4 mb-3"><h3 class="text-xs font-bold text-gray-400 mb-2">身体评分</h3><div class="grid grid-cols-4 gap-2">${['energy','sleep','skin','digestion'].map(m=>{const l={energy:'精力',sleep:'睡眠',skin:'皮肤',digestion:'消化'},v=ci.scores[m];return`<div class="text-center"><div class="text-lg">${SE[v]}</div><div class="text-[10px] text-gray-400">${l[m]}</div><div class="text-xs font-bold text-bark">${v}/5</div></div>`}).join('')}</div></div>${ci.note?'<div class="card p-4 mb-3"><h3 class="text-xs font-bold text-gray-400 mb-1">备注</h3><p class="text-sm text-bark">'+eh(ci.note)+'</p></div>':''}<div class="p-4 rounded-2xl bg-gradient-to-r from-terra/10 to-amber-50 border-2 border-dashed border-terra/30 mb-3"><div class="flex items-center gap-2 mb-2"><i class="fa-solid fa-share-nodes text-terra"></i><span class="text-sm font-bold text-terra">分享到小红书</span></div><p class="text-xs text-gray-400 mb-3">一键生成含@TA的打卡文案</p><button onclick="genSH()" class="w-full py-3 bg-terra text-white rounded-xl font-bold text-sm hover:bg-terra/90 transition-colors active:scale-[0.97]"><i class="fa-solid fa-copy mr-1"></i> 生成并复制小红书文案</button></div>`
+    }else{
+        const yd=fm(new Date(Date.now()-864e5));let w='';
+        if(yd>=D.challenge.startDate&&!D.users[cu()].checkins[yd])w=`<div class="card p-4 mb-4 border-2 border-red-200 bg-red-50/50"><div class="flex items-center gap-2 mb-2"><i class="fa-solid fa-triangle-exclamation text-red-500"></i><span class="text-sm font-bold text-red-600">昨天未打卡</span></div><p class="text-xs text-red-500 mb-2">漏打卡罚款 ¥10</p><button onclick="addMP('${yd}')" class="px-4 py-1.5 bg-red-500 text-white text-xs rounded-lg font-bold hover:bg-red-600 transition-colors">确认漏打卡，罚款 ¥10</button></div>`;
+        const ml2={breakfast:'早餐',lunch:'午餐',dinner:'晚餐',snack:'加餐（选填）'};
+        el.innerHTML=`${w}<div class="card p-5 mb-4 text-center"><div class="text-xs text-gray-400 mb-1">${td}</div><h2 class="text-xl font-bold text-bark">第 ${dn} 天打卡</h2></div><div class="card p-4 mb-3"><h3 class="text-sm font-bold text-bark mb-3"><i class="fa-solid fa-utensils text-forest mr-1.5"></i>今日饮食</h3><div class="space-y-3">${['breakfast','lunch','dinner','snack'].map(m=>`<div><label class="text-xs font-bold text-gray-500 mb-1 block">${ml2[m]}${m!=='snack'?' *':''}</label><textarea id="m_${m}" class="inf" rows="2" placeholder="记录你吃了什么..."></textarea></div>`).join('')}</div></div><div class="card p-4 mb-3"><h3 class="text-sm font-bold text-bark mb-3"><i class="fa-solid fa-heart-pulse text-terra mr-1.5"></i>身体评分</h3><div class="space-y-4">${['energy','sleep','skin','digestion'].map(m=>{const l={energy:'精力',sleep:'睡眠',skin:'皮肤',digestion:'消化'};return`<div><div class="flex items-center justify-between mb-1"><span class="text-xs font-bold text-gray-500">${l[m]}</span><span id="sl_${m}" class="text-sm font-bold">${SE[3]} ${SL[3]}</span></div><input type="range" id="sc_${m}" min="1" max="5" value="3" oninput="document.getElementById('sl_${m}').textContent=SE[this.value]+' '+SL[this.value]"></div>`}).join('')}</div></div><div class="card p-4 mb-3"><h3 class="text-sm font-bold text-bark mb-2"><i class="fa-regular fa-note-sticky text-gray-400 mr-1.5"></i>备注</h3><textarea id="ciN" class="inf" rows="2" placeholder="今天的感受、身体变化..."></textarea></div><div class="p-3 rounded-2xl bg-amber-50/60 border border-amber-200/50 mb-3"><div class="flex items-center gap-2 mb-2"><i class="fa-solid fa-share-nodes text-terra text-sm"></i><span class="text-xs font-bold text-terra">小红书文案预览</span></div><div id="pvT" class="text-xs text-gray-500 bg-white/60 rounded-lg p-2.5 min-h-[60px] mb-2 whitespace-pre-line leading-relaxed">填写内容后点下方按钮预览...</div><button onclick="pvSH()" class="w-full py-2 bg-terra/10 text-terra rounded-lg text-xs font-bold hover:bg-terra/20 transition-colors"><i class="fa-solid fa-eye mr-1"></i> 刷新预览</button></div><button onclick="subCI(true)" class="w-full py-3 bg-red-50 text-red-500 rounded-2xl font-bold text-sm mb-3 hover:bg-red-100 transition-colors border border-red-200"><i class="fa-solid fa-hand mr-1"></i> 我破戒了（诚实减半，罚款 ¥5）</button><button onclick="subCI(false)" class="w-full py-3.5 bg-forest text-white rounded-2xl font-bold text-base hover:bg-mint transition-colors active:scale-[0.97]">提交打卡 <i class="fa-solid fa-check ml-1"></i></button>`
+    }
+}
+
+/* ===== 小红书文案 ===== */
+function bST(meals,sc,note){const dn=db2(pd(D.challenge.startDate),pd(gt()))+1;let t='抗炎挑战 Day '+dn+' 打卡\n━━━━━━━━━━━━\n';if(meals.breakfast)t+='早餐：'+meals.breakfast+'\n';if(meals.lunch)t+='午餐：'+meals.lunch+'\n';if(meals.dinner)t+='晚餐：'+meals.dinner+'\n';if(meals.snack)t+='加餐：'+meals.snack+'\n';t+='━━━━━━━━━━━━\n精力'+'⭐'.repeat(sc.energy)+' 睡眠'+'⭐'.repeat(sc.sleep)+'\n皮肤'+'⭐'.repeat(sc.skin)+' 消化'+'⭐'.repeat(sc.digestion)+'\n';if(note)t+='\n'+note+'\n';t+='\n@'+un(ou())+' 今天的你也打卡了吗？';t+='\n\n#抗炎挑战 #抗炎饮食 #健康打卡';return t}
+function pvSH(){const m={},s={};['breakfast','lunch','dinner','snack'].forEach(k=>{const e=document.getElementById('m_'+k);m[k]=e?e.value.trim():''});['energy','sleep','skin','digestion'].forEach(k=>{const e=document.getElementById('sc_'+k);s[k]=e?parseInt(e.value):3});const n=document.getElementById('ciN');document.getElementById('pvT').textContent=bST(m,s,n?n.value.trim():'')}
+function genSH(){const ci=D.users[cu()].checkins[gt()];if(!ci){showToast('找不到今日打卡记录','error');return}document.getElementById('shT').value=bST(ci.meals,ci.scores,ci.note);document.getElementById('mSH').classList.add('show')}
+function cpSH(){const t=document.getElementById('shT');t.select();t.setSelectionRange(0,99999);if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(t.value).then(()=>{showToast('已复制，去小红书发布吧','success');document.getElementById('mSH').classList.remove('show')}).catch(()=>fbCp(t))}else fbCp(t)}
+function fbCp(t){try{if(document.execCommand('copy')){showToast('已复制，去小红书发布吧','success');document.getElementById('mSH').classList.remove('show')}else showToast('请手动长按文字复制','info')}catch(e){showToast('请手动长按文字复制','info')}}
+
+/* ===== 提交打卡 ===== */
+function subCI(ch){
+    const m={},ml={breakfast:'早餐',lunch:'午餐',dinner:'晚餐'};
+    for(const k of['breakfast','lunch','dinner']){const v=document.getElementById('m_'+k).value.trim();if(!v){showToast('请填写'+ml[k],'error');return}m[k]=v}
+    m.snack=document.getElementById('m_snack').value.trim();const s={};['energy','sleep','skin','digestion'].forEach(k=>{s[k]=parseInt(document.getElementById('sc_'+k).value)});
+    const note=document.getElementById('ciN').value.trim();
+    D.users[cu()].checkins[gt()]={meals:m,scores:s,note,cheated:ch,timestamp:Date.now()};
+    if(ch){D.users[cu()].penalties.push({date:gt(),amount:5,reason:'主动承认破戒（减半）'});showToast('已记录破戒，罚款 ¥5（诚实减半）','info')}else showToast('打卡成功！','success');
+    save();showConfetti();rCI()
+}
+function addMP(d){D.users[cu()].penalties.push({date:d,amount:10,reason:d+' 漏打卡'});save();showToast('已记录漏打卡罚款 ¥10','info');rCI()}
+
+/* ===== 日历 + 编辑/删除 ===== */
+function rCA(){
+    const el=document.getElementById('xCA'),y=cY,mo=cM,mn=['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'];
+    const fd=new Date(y,mo,1).getDay(),dim=new Date(y,mo+1,0).getDate(),td=gt(),st=D.challenge.startDate;
+    let g='';const of2=(fd+6)%7;for(let i=0;i<of2;i++)g+='<div></div>';
+    for(let d=1;d<=dim;d++){const ds=`${y}-${String(mo+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`,s=gDs(cu(),ds),iT=ds===td,iF=ds>td,iB=st&&ds<st;let c='cal-day';if(iF||iB)c+=' future';else if(s==='checked')c+=' checked';else if(s==='cheated')c+=' cheated';else if(s==='missed')c+=' missed';if(iT)c+=' today';const ck=!iF&&!iB&&s;g+=`<div class="${c}"${ck?` onclick="sDD('${ds}')"`:''}>${d}</div>`}
+    el.innerHTML=`<div class="card p-4 mb-4"><div class="flex items-center justify-between mb-4"><button onclick="cMo(-1)" class="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-500"><i class="fa-solid fa-chevron-left text-xs"></i></button><h3 class="text-base font-bold text-bark">${y}年 ${mn[mo]}</h3><button onclick="cMo(1)" class="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-500"><i class="fa-solid fa-chevron-right text-xs"></i></button></div><div class="grid grid-cols-7 gap-1 mb-2">${['一','二','三','四','五','六','日'].map(d=>'<div class="text-center text-[10px] font-bold text-gray-400 py-1">'+d+'</div>').join('')}</div><div class="grid grid-cols-7 gap-1">${g}</div><div class="flex items-center justify-center gap-4 mt-3 text-[10px] text-gray-400"><span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-[#D8F3DC]"></span>已打卡</span><span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-[#FEE2E2]"></span>破戒</span><span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-[#F3F0EB]"></span>漏打卡</span></div></div><div class="card p-4"><h3 class="text-sm font-bold text-bark mb-2">${un(cu())} 的统计</h3><div class="grid grid-cols-3 gap-3 text-center"><div><div class="text-xl font-bold text-forest">${gCc(cu())}</div><div class="text-[10px] text-gray-400">打卡天数</div></div><div><div class="text-xl font-bold text-terra">${gSt(cu())}</div><div class="text-[10px] text-gray-400">连续天数</div></div><div><div class="text-xl font-bold text-bark">${gBs(cu())}</div><div class="text-[10px] text-gray-400">最佳连续</div></div></div></div>`
+}
+function cMo(d){cM+=d;if(cM<0){cM=11;cY--}if(cM>11){cM=0;cY++}rCA()}
+
+/* 日历弹窗三态：查看 → 编辑 → 确认删除 */
+function sDD(ds){const ci=D.users[cu()].checkins[ds];if(!ci)return;dtRead(ds,ci);document.getElementById('mDT').classList.add('show')}
+function dtRead(ds,ci){
+    document.getElementById('dTi').textContent=ds;
+    const ml={breakfast:'早餐',lunch:'午餐',dinner:'晚餐',snack:'加餐'};
+    document.getElementById('dBd').innerHTML=`<div class="space-y-3"><div><h4 class="text-xs font-bold text-gray-400 mb-1">饮食记录</h4>${Object.entries(ci.meals).filter(([,v])=>v).map(([k,v])=>'<div class="mb-1"><span class="text-xs font-bold text-forest">'+ml[k]+'</span> <span class="text-sm">'+eh(v)+'</span></div>').join('')||'<span class="text-sm text-gray-400">无记录</span>'}</div><div><h4 class="text-xs font-bold text-gray-400 mb-1">身体评分</h4><div class="grid grid-cols-4 gap-2">${['energy','sleep','skin','digestion'].map(m=>{const l={energy:'精力',sleep:'睡眠',skin:'皮肤',digestion:'消化'},v=ci.scores[m];return'<div class="text-center"><div class="text-lg">'+SE[v]+'</div><div class="text-[10px] text-gray-400">'+l[m]+'</div><div class="text-xs font-bold text-bark">'+v+'/5</div></div>'}).join('')}</div></div>${ci.cheated?'<div class="p-2 bg-red-50 rounded-lg text-xs text-red-500 font-bold"><i class="fa-solid fa-triangle-exclamation mr-1"></i>当天有破戒记录</div>':''}${ci.note?'<div><h4 class="text-xs font-bold text-gray-400 mb-1">备注</h4><p class="text-sm">'+eh(ci.note)+'</p></div>':''}</div><div class="flex gap-2 mt-4 pt-3 border-t border-gray-100"><button onclick="dtEdit('${ds}')" class="flex-1 py-2.5 bg-forest/10 text-forest rounded-xl text-xs font-bold hover:bg-forest/20 transition-colors"><i class="fa-solid fa-pen mr-1"></i>编辑</button><button onclick="dtDelC('${ds}')" class="flex-1 py-2.5 bg-red-50 text-red-500 rounded-xl text-xs font-bold hover:bg-red-100 transition-colors border border-red-200"><i class="fa-solid fa-trash mr-1"></i>删除</button></div>`
+}
+function dtEdit(ds){
+    document.getElementById('dTi').textContent='编辑 '+ds;
+    const ci=D.users[cu()].checkins[ds],ml={breakfast:'早餐',lunch:'午餐',dinner:'晚餐',snack:'加餐（选填）'};
+    document.getElementById('dBd').innerHTML=`<div class="space-y-3">${['breakfast','lunch','dinner','snack'].map(m=>'<div><label class="text-xs font-bold text-gray-500 mb-1 block">'+ml[m]+'</label><textarea id="ed_'+m+'" class="inf" rows="2">'+eh(ci.meals[m]||'')+'</textarea></div>').join('')}<div class="space-y-3">${['energy','sleep','skin','digestion'].map(m=>{const l={energy:'精力',sleep:'睡眠',skin:'皮肤',digestion:'消化'};return'<div><div class="flex items-center justify-between mb-1"><span class="text-xs font-bold text-gray-500">'+l[m]+'</span><span id="esl_'+m+'" class="text-sm font-bold">'+SE[ci.scores[m]]+' '+SL[ci.scores[m]]+'</span></div><input type="range" id="esc_'+m+'" min="1" max="5" value="'+ci.scores[m]+'" oninput="document.getElementById(\'esl_'+m+'\').textContent=SE[this.value]+\' \'+SL[this.value]"></div>'}).join('')}</div><div><label class="text-xs font-bold text-gray-500 mb-1 block">备注</label><textarea id="edN" class="inf" rows="2">'+eh(ci.note||'')+'</textarea></div><label class="flex items-center gap-2 cursor-pointer p-2 rounded-lg hover:bg-gray-50"><input type="checkbox" id="edCh" ${ci.cheated?'checked':''} class="w-4 h-4 accent-red-500 rounded"><span class="text-xs text-red-500 font-bold">有破戒记录</span></label></div><div class="flex gap-2 mt-4 pt-3 border-t border-gray-100"><button onclick="sDD('${ds}')" class="flex-1 py-2.5 bg-gray-100 text-gray-600 rounded-xl text-xs font-bold hover:bg-gray-200 transition-colors">取消</button><button onclick="dtSave('${ds}')" class="flex-1 py-2.5 bg-forest text-white rounded-xl text-xs font-bold hover:bg-mint transition-colors">保存修改</button></div>`
+}
+function dtSave(ds){
+    const m={};['breakfast','lunch','dinner'].forEach(k=>{m[k]=document.getElementById('ed_'+k).value.trim()});m.snack=document.getElementById('ed_snack').value.trim();
+    const s={};['energy','sleep','skin','digestion'].forEach(k=>{s[k]=parseInt(document.getElementById('esc_'+k).value)});
+    const note=document.getElementById('edN').value.trim(),ch=document.getElementById('edCh').checked;
+    D.users[cu()].checkins[ds]={meals:m,scores:s,note,cheated:ch,timestamp:Date.now()};
+    save();showToast('已更新','success');dtRead(ds,D.users[cu()].checkins[ds]);rCA()
+}
+function dtDelC(ds){
+    document.getElementById('dTi').textContent='确认删除';
+    document.getElementById('dBd').innerHTML=`<div class="text-center py-4"><div class="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-3"><i class="fa-solid fa-trash text-xl text-red-500"></i></div><h3 class="text-base font-bold text-bark mb-1">删除 ${ds} 的打卡记录？</h3><p class="text-sm text-gray-400 mb-4">此操作不可撤销</p><div class="flex gap-2"><button onclick="sDD('${ds}')" class="flex-1 py-2.5 bg-gray-100 text-gray-600 rounded-xl text-xs font-bold hover:bg-gray-200">取消</button><button onclick="dtDoDel('${ds}')" class="flex-1 py-2.5 bg-red-500 text-white rounded-xl text-xs font-bold hover:bg-red-600">确认删除</button></div></div>`
+}
+function dtDoDel(ds){delete D.users[cu()].checkins[ds];save();showToast('已删除','info');document.getElementById('mDT').classList.remove('show');rCA()}
+
+/* ===== 罚款 ===== */
+function rPN(){
+    const el=document.getElementById('xPN'),p1=gPt('user1'),p2=gPt('user2'),t=p1+p2;
+    const ps=[...D.users.user1.penalties.map(p=>({...p,u:'user1',n:un('user1')})),...D.users.user2.penalties.map(p=>({...p,u:'user2',n:un('user2')}))].sort((a,b)=>b.date.localeCompare(a.date));
+    el.innerHTML=`<div class="card p-5 text-center mb-4"><div class="text-xs text-gray-400 mb-2">罚款池总额</div><div class="text-4xl font-bold text-terra mb-1">¥${t}</div><div class="text-xs text-gray-400">等挑战结束后一起花掉</div></div><div class="grid grid-cols-2 gap-3 mb-4"><div class="card p-4 text-center"><div class="w-8 h-8 rounded-full bg-forest text-white text-sm flex items-center justify-center font-bold mx-auto mb-2">${un('user1').charAt(0)}</div><div class="text-lg font-bold text-bark">¥${p1}</div><div class="text-[10px] text-gray-400">${D.users.user1.penalties.length} 次</div></div><div class="card p-4 text-center"><div class="w-8 h-8 rounded-full bg-terra text-white text-sm flex items-center justify-center font-bold mx-auto mb-2">${un('user2').charAt(0)}</div><div class="text-lg font-bold text-bark">¥${p2}</div><div class="text-[10px] text-gray-400">${D.users.user2.penalties.length} 次</div></div></div><div class="card p-4 mb-4"><h3 class="text-sm font-bold text-bark mb-3"><i class="fa-solid fa-bullseye text-terra mr-1.5"></i>罚款池用途</h3><input id="rwG" class="inf" value="${eh(D.challenge.rewardGoal)}" placeholder="挑战结束后一起做什么？"><button onclick="D.challenge.rewardGoal=document.getElementById('rwG').value.trim()||'挑战结束后一起吃顿好的';save();showToast('用途已保存','success')" class="mt-2 w-full py-2 bg-forest/10 text-forest rounded-xl text-xs font-bold hover:bg-forest/20 transition-colors">保存用途</button></div><div class="card p-4 mb-4"><h3 class="text-sm font-bold text-bark mb-3"><i class="fa-solid fa-plus text-terra mr-1.5"></i>手动添加罚款</h3><div class="flex gap-2 mb-2"><select id="mU" class="inf flex-1"><option value="user1">${un('user1')}</option><option value="user2">${un('user2')}</option></select><input id="mA" type="number" class="inf w-20" value="10" min="1" max="999"></div><input id="mR" class="inf mb-2" placeholder="罚款原因..."><button onclick="aMP()" class="w-full py-2 bg-terra text-white rounded-xl text-xs font-bold hover:bg-terra/80 transition-colors">添加罚款</button></div><div class="card p-4"><h3 class="text-sm font-bold text-bark mb-3">罚款记录</h3>${ps.length===0?'<p class="text-sm text-gray-300 text-center py-4">还没有罚款记录</p>':'<div class="space-y-2 max-h-60 overflow-y-auto">'+ps.map(p=>'<div class="flex items-center justify-between py-2 border-b border-gray-50 last:border-0"><div class="flex items-center gap-2"><span class="w-5 h-5 rounded-full text-white text-[10px] flex items-center justify-center font-bold" style="background:'+(p.u==='user1'?'#2D6A4F':'#E76F51')+'">'+p.n.charAt(0)+'</span><div><div class="text-xs font-bold text-bark">'+eh(p.reason)+'</div><div class="text-[10px] text-gray-400">'+p.date+'</div></div></div><span class="text-sm font-bold text-red-500">¥'+p.amount+'</span></div>').join('')+'</div>'}</div>`
+}
+function aMP(){const uid=document.getElementById('mU').value,amt=parseInt(document.getElementById('mA').value)||10,rsn=document.getElementById('mR').value.trim()||'手动添加';D.users[uid].penalties.push({date:gt(),amount:Math.max(1,amt),reason:rsn});save();showToast('已为 '+un(uid)+' 添加罚款 ¥'+amt,'info');rPN()}
+
+/* ===== 食材库 ===== */
+function showFM(){document.getElementById('fml').innerHTML=Object.entries(FD).map(([c,items])=>'<div class="mb-4"><h4 class="text-xs font-bold text-forest mb-2">'+c+'</h4><div>'+items.map(f=>'<span class="ft">'+f+'</span>').join('')+'</div></div>').join('');document.getElementById('mFM').classList.add('show')}
+
+/* ===== Toast & Confetti ===== */
+function showToast(m,t){const e=document.getElementById('toast');e.textContent=m;e.className='toast '+(t||'success')+' show';setTimeout(()=>e.classList.remove('show'),2500)}
+function showConfetti(){const cv=document.getElementById('cc'),ctx=cv.getContext('2d');cv.width=innerWidth;cv.height=innerHeight;cv.style.display='block';const cs=['#2D6A4F','#52B788','#E76F51','#F4A261','#E9C46A','#95D5B2'];const ps=Array.from({length:80},()=>({x:cv.width*.5+(Math.random()-.5)*cv.width*.6,y:cv.height*.3+(Math.random()-.5)*100,w:Math.random()*10+4,h:Math.random()*6+2,c:cs[Math.floor(Math.random()*cs.length)],vx:(Math.random()-.5)*8,vy:-(Math.random()*6+3),r:Math.random()*360,rv:(Math.random()-.5)*12,o:1,g:.12+Math.random()*.05}));let f=0;(function go(){ctx.clearRect(0,0,cv.width,cv.height);let a=false;for(const p of ps){p.x+=p.vx;p.vy+=p.g;p.y+=p.vy;p.vx*=.99;p.r+=p.rv;if(f>50)p.o-=.015;if(p.o>0&&p.y<cv.height+30){a=true;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.r*Math.PI/180);ctx.globalAlpha=Math.max(0,p.o);ctx.fillStyle=p.c;ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);ctx.restore()}}f++;if(a)requestAnimationFrame(go);else cv.style.display='none'})()}
+
+document.addEventListener('DOMContentLoaded',init);
+</script>
+</body>
+</html>
