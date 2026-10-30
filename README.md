@@ -1,36 +1,33 @@
-# 抗炎挑战（双人版）
+# Anti-Inflammatory Challenge (Duo Edition)
 
-一个适合两人共同使用的抗炎饮食打卡网页。项目为单文件静态应用，可直接在浏览器中运行。
+A two-person anti-inflammatory diet check-in web app. It is a single-file static app that runs directly in the browser.
 
-## 功能
+## Features
 
-- 双人打卡与进度记录
-- 抗炎饮食挑战任务
-- 浏览器本地数据存储
-- 可选的腾讯云开发 CloudBase 数据同步
-- 移动端响应式界面
+- Check-ins and progress tracking for two people
+- Anti-inflammatory diet challenge tasks
+- Local browser storage
+- Responsive, mobile-friendly interface
 
-## 在线访问
+## Live Site
 
-GitHub Pages：
+GitHub Pages:
 
 https://crafy-ai.github.io/anti-inflammatory-challenge-duo/
 
-## 本地使用
+## Local Development
 
-直接用浏览器打开 `index.html`，或者在项目目录启动静态服务器：
+Open `index.html` directly in a browser, or start a static server in the project directory:
 
 ```bash
 python -m http.server 8000
 ```
 
-随后访问 `http://localhost:8000/`。
+Then visit `http://localhost:8000/`.
 
-## 云端同步
+## Data & Privacy
 
-页面默认可以在本地使用。若需要两台设备同步数据，可在页面中按照提示创建腾讯云开发 CloudBase 环境，并填写自己的环境 ID。
-
-仓库中不包含任何 CloudBase 环境 ID、访问密钥或个人账号信息。
+All data is stored locally in your browser. The site does not send your check-ins to any server.
 
 ## License
 
